@@ -22,21 +22,10 @@ type Config struct {
 }
 
 func main() {
-	// Read config.yaml file
-	configFile, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		log.Fatalf("Failed to read config file: %v", err)
+	err, done := InitConfig()
+	if !done {
+		return
 	}
-	// Parse YAML
-	var config Config
-	if err = yaml.Unmarshal(configFile, &config); err != nil {
-		log.Fatalf("Failed to unmarshal config: %v", err)
-	}
-	// Set environment variables
-	os.Setenv("DB_HOST", config.Database.Host)
-	os.Setenv("DB_PORT", config.Database.Port)
-	os.Setenv("DB_USER", config.Database.User)
-	os.Setenv("DB_PASSWORD", config.Database.Password)
 
 	// Initialize database connection
 	err = database.InitDB()
@@ -62,4 +51,41 @@ func main() {
 		TLSConfig: tlsConfig,
 	}
 	log.Fatal(server.ListenAndServeTLS("/app/server.crt", "/app/server.key"))
+}
+
+func InitConfig() (error, bool) {
+	// Read config.yaml file
+	configFile, err := ioutil.ReadFile("config.yaml")
+	if err != nil {
+		log.Fatalf("Failed to read config file: %v", err)
+		return err, false
+	}
+	// Parse YAML
+	var config Config
+	if err = yaml.Unmarshal(configFile, &config); err != nil {
+		log.Fatalf("Failed to unmarshal config: %v", err)
+		return err, false
+	}
+	// Set environment variables
+	err = os.Setenv("DB_HOST", config.Database.Host)
+	if err != nil {
+		log.Fatalf("Failed to set env: %v", err)
+		return err, false
+	}
+	err = os.Setenv("DB_PORT", config.Database.Port)
+	if err != nil {
+		log.Fatalf("Failed to set env: %v", err)
+		return err, false
+	}
+	err = os.Setenv("DB_USER", config.Database.User)
+	if err != nil {
+		log.Fatalf("Failed to set env: %v", err)
+		return err, false
+	}
+	err = os.Setenv("DB_PASSWORD", config.Database.Password)
+	if err != nil {
+		log.Fatalf("Failed to set env: %v", err)
+		return err, false
+	}
+	return nil, true
 }

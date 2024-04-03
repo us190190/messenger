@@ -65,7 +65,7 @@ func MarkPvtMsgDelivered(ID int) (bool, error) {
 	return true, nil
 }
 
-func InsertNewMessage(msg Message) (bool, error) {
+func InsertNewMessage(msg Message) (int, error) {
 	db := database.GetDB()
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
 	isDelivered := 0
@@ -74,9 +74,15 @@ func InsertNewMessage(msg Message) (bool, error) {
 	} else {
 		isDelivered = 0
 	}
-	_, err := db.Exec(fmt.Sprintf("INSERT INTO messages (sender_id, receiver_id, group_id, message, is_delivered, created_at, updated_at) VALUES (%d, %d, %d, '%s', %d, '%s', '%s')", msg.SenderID, msg.ReceiverID, msg.GroupID, msg.Message, isDelivered, timeNow, timeNow))
+	result, err := db.Exec(fmt.Sprintf("INSERT INTO messages (sender_id, receiver_id, group_id, message, is_delivered, created_at, updated_at) VALUES (%d, %d, %d, '%s', %d, '%s', '%s')", msg.SenderID, msg.ReceiverID, msg.GroupID, msg.Message, isDelivered, timeNow, timeNow))
 	if err != nil {
-		return false, err
+		return 0, err
 	}
-	return true, nil
+
+	// Get the last insert ID
+	lastInsertID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(lastInsertID), nil
 }

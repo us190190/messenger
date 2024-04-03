@@ -147,20 +147,52 @@ func handleWebSocketMessages(currentUser *models.User, conn *websocket.Conn) {
 				msg.IsDelivered = true
 			}
 			mutex.Unlock()
+
+			// Insert pvt message into database along with the status whether it was delivered or not
+			_, err = models.InsertNewMessage(msg)
+			if err != nil {
+				log.Printf("Failed to insert message from user %s: %+v : %s\n", currentUser.Username, msg, err)
+				break
+			}
 		} else if msg.GroupID > 0 {
 			// group messages
+			msg.IsDelivered = true
 
-			// TODO insert message and get inserted id, then try sending the message to group user, and update last delivered message in db for the user
+			// Insert message into database along with the status whether it was delivered or not
+			lastInsertID, err := models.InsertNewMessage(msg)
+			if err != nil {
+				log.Printf("Failed to insert group message from user %s: %+v : %s\n", currentUser.Username, msg, err)
+				break
+			}
+			msg.ID = lastInsertID
 
-			// TODO send message to active group members
-			// TODO store in db members who were not active
-		}
+			// Get members of groupID
+			grpMembers, err := models.GetGrpMbrsByGroupID(msg.GroupID)
+			if err != nil {
+				log.Printf("Error fetching members of group %d: %s\n", msg.GroupID, err)
+				return
+			}
+			for _, currGrpMember := range grpMembers {
+				if currGrpMember.UserID == msg.SenderID {
+					continue
+				}
+				currGrpMemberConn, ok := connections[currGrpMember.UserID]
+				if ok {
+					// Group member is connected
+					err = currGrpMemberConn.WriteMessage(messageType, message)
+					if err != nil {
+						log.Printf("Error writing group message to WebSocket from user %s: %s\n", currentUser.Username, err)
+						continue
+					}
+					_, err = models.UpdateLastMsgDelvrdUsrInGrp(currGrpMember.UserID, currGrpMember.GroupID, msg.ID)
+					if err != nil {
+						log.Printf("Unable to update last delivered message of user in group msgID: %d error: %v", msg.ID, err)
+						continue
+					}
 
-		// Insert message into database along with the status whether it was delivered or not
-		_, err = models.InsertNewMessage(msg)
-		if err != nil {
-			log.Printf("Failed to insert message from user %s: %+v : %s\n", currentUser.Username, msg, err)
-			break
+				}
+			}
+
 		}
 
 	}
