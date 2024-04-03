@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/us190190/messenger/database"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -22,7 +23,7 @@ type Message struct {
 func GetUndeliveredPvtMsgsByUserID(receiverID int) ([]Message, error) {
 	var undeliveredPvtMsgs []Message
 	db := database.GetDB()
-	qry := fmt.Sprintf("SELECT id, sender_id, receiver_id, group_id, created_at, updated_at "+
+	qry := fmt.Sprintf("SELECT id, sender_id, receiver_id, group_id, message, created_at, updated_at "+
 		"FROM messages WHERE receiver_id = %d AND is_delivered = 0 AND group_id = 0 "+
 		"ORDER BY created_at", receiverID)
 	rows, err := db.Query(qry)
@@ -39,7 +40,7 @@ func GetUndeliveredPvtMsgsByUserID(receiverID int) ([]Message, error) {
 
 	for rows.Next() {
 		var curMsg Message
-		err := rows.Scan(&curMsg.ID, &curMsg.SenderID, &curMsg.ReceiverID, &curMsg.GroupID, &curMsg.CreatedAt, &curMsg.UpdatedAt)
+		err := rows.Scan(&curMsg.ID, &curMsg.SenderID, &curMsg.ReceiverID, &curMsg.GroupID, &curMsg.Message, &curMsg.CreatedAt, &curMsg.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -85,4 +86,69 @@ func InsertNewMessage(msg Message) (int, error) {
 		return 0, err
 	}
 	return int(lastInsertID), nil
+}
+
+func GetUndeliveredGrpMsgsByUserID(userID int) ([]Message, error) {
+	var undeliveredGrpMsgsWhereClauseList []string
+	db := database.GetDB()
+	qry := fmt.Sprintf("SELECT id, user_id, group_id, last_delivered_msg_id "+
+		"FROM group_members WHERE user_id = %d", userID)
+	log.Println(fmt.Sprintf("undeliveredGrpMsgsWhereClauseList qry: %s", qry))
+	rows, err := db.Query(qry)
+	if err != nil {
+		log.Println(fmt.Sprintf("GetUndeliveredGrpMsgsByUserID failed qry: %s error: %v\n", qry, err))
+		return nil, err
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			// log  fatal error
+		}
+	}(rows)
+
+	for rows.Next() {
+		var curGrp GroupMember
+		err := rows.Scan(&curGrp.ID, &curGrp.UserID, &curGrp.GroupID, &curGrp.LastDeliveredMsgID)
+		if err != nil {
+			return nil, err
+		}
+		currentClause := fmt.Sprintf("(group_id = %d AND id > %d AND sender_id <> %d)",
+			curGrp.GroupID, curGrp.LastDeliveredMsgID, userID)
+		undeliveredGrpMsgsWhereClauseList = append(undeliveredGrpMsgsWhereClauseList, currentClause)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	undeliveredGrpMsgsWhereClause := "( " + strings.Join(undeliveredGrpMsgsWhereClauseList, " OR ") + " )"
+
+	var undeliveredGrpMsgs []Message
+	db = database.GetDB()
+	qry = fmt.Sprintf("SELECT id, sender_id, receiver_id, group_id, message, created_at, updated_at "+
+		"FROM messages WHERE %s ORDER BY created_at", undeliveredGrpMsgsWhereClause)
+	log.Println(fmt.Sprintf("undeliveredGrpMsgs qry: %s", qry))
+	rows, err = db.Query(qry)
+	if err != nil {
+		log.Println(fmt.Sprintf("GetUndeliveredGrpMsgsByUserID failed qry: %s error: %v\n", qry, err))
+		return nil, err
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			// log  fatal error
+		}
+	}(rows)
+
+	for rows.Next() {
+		var curMsg Message
+		err := rows.Scan(&curMsg.ID, &curMsg.SenderID, &curMsg.ReceiverID, &curMsg.GroupID, &curMsg.Message, &curMsg.CreatedAt, &curMsg.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		undeliveredGrpMsgs = append(undeliveredGrpMsgs, curMsg)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return undeliveredGrpMsgs, err
 }

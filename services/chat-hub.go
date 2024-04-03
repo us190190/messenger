@@ -103,7 +103,31 @@ func HandleWebSocket(responseWriter http.ResponseWriter, request *http.Request) 
 	mutex.Unlock()
 
 	// Deliver pending group messages
-	// TODO write logic
+	undeliveredGrpMsgs, err := models.GetUndeliveredGrpMsgsByUserID(currentUser.ID)
+	if err != nil {
+		log.Printf("Error fetching undelivered group message for user %s: %s\n", currentUser.Username, err)
+		return
+	}
+	for _, currGrpMsg := range undeliveredGrpMsgs {
+		if currGrpMsg.SenderID == currentUser.ID {
+			continue
+		}
+		byteMsg, err := json.Marshal(currGrpMsg)
+		if err != nil {
+			log.Printf("Error writing group message to WebSocket for user %s: %s\n", currentUser.Username, err)
+			continue
+		}
+		err = conn.WriteMessage(1, byteMsg)
+		if err != nil {
+			log.Printf("Error writing group message to WebSocket for user %s: %s\n", currentUser.Username, err)
+			continue
+		}
+		_, err = models.UpdateLastMsgDelvrdUsrInGrp(currentUser.ID, currGrpMsg.GroupID, currGrpMsg.ID)
+		if err != nil {
+			log.Printf("Unable to update last delivered message of user in group msgID: %d error: %v", currGrpMsg.ID, err)
+			continue
+		}
+	}
 
 	// Start a goroutine to handle messages from this WebSocket connection
 	activeConnections.Add(1)
