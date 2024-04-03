@@ -1,4 +1,3 @@
 .idea
 *.iml
 gcp-deployments-manager
-config.yaml
