@@ -51,6 +51,7 @@ func main() {
 	http.HandleFunc("/v1/user/authenticate", services.UserAuthenticationHandler)
 	http.HandleFunc("/v1/user/remove", services.UserRemoveHandler)
 	http.HandleFunc("/v1/user/all", services.UserAllHandler)
+	http.HandleFunc("/v1/groups/all", services.GroupAllHandler)
 	http.HandleFunc("/start", services.HandleWebSocket)
 
 	// Start server with HTTPS

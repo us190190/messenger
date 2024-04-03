@@ -277,3 +277,53 @@ func UserAllHandler(responseWriter http.ResponseWriter, request *http.Request) {
 		return
 	}
 }
+
+func GroupAllHandler(responseWriter http.ResponseWriter, request *http.Request) {
+	if request.Method != http.MethodGet {
+		http.Error(responseWriter, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	db := database.GetDB()
+	rows, err := db.Query("SELECT id, group_name FROM `groups`")
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			// log  fatal error
+		}
+	}(rows)
+
+	var groups []models.Group
+	for rows.Next() {
+		var curGrp models.Group
+		err := rows.Scan(&curGrp.ID, &curGrp.GroupName)
+		if err != nil {
+			http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		groups = append(groups, curGrp)
+	}
+	if err := rows.Err(); err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	jsonData, err := json.Marshal(groups)
+	if err != nil {
+		http.Error(responseWriter, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Set response content type to JSON
+	responseWriter.Header().Set("Content-Type", "application/json")
+
+	// Write JSON response
+	_, err = responseWriter.Write(jsonData)
+	if err != nil {
+		return
+	}
+}
