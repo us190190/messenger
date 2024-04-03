@@ -15,28 +15,29 @@
 3. Adding database migrations and seeder for the backend service
 
 ## Architecture diagram
-1.
+1. TODO
 
 ## Low level design
-1.
+1. TODO
 
 ## Flow diagram
-1.
+1. TODO
 
-## Steps to deploy backend service on GCP
-1.
+## Steps to deploy backend service on GCP DM
+   gcloud deployment-manager deployments create messenger-app-infra --config messenger-deployment.yaml
 
 ## Steps to deploy docker container on local
-1.
+   sudo apt update
+   sudo apt install -y docker.io
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   docker pull us190190/messenger-app:3.0
+   docker run -e DB_HOST=XYZ -e DB_PASSWORD=XYZ -e DB_PORT=XYZ -e DB_USER=XYZ -p 443:443 messenger-app:3.0
 
 ## Steps to utilize postman collection
-1.
+1. User management APIs collection: [User management APIs.postman_collection.json]
+2. Messenger connection: [wss://<SERVER_IP_ADDRESS>:443/start]
 
 ## Known issues
 1. Both live messages don't contain sender user information (sender is required to share his/her info along with each message)
 2. Need to manually add VM instance public IP to allow connectivity with DB instance
-
-TODO:
-# GCP infra launch config
-1. config.yaml in DockerFile
-2. commit files in git repo, add steps in READme

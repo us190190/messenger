@@ -1,0 +1,27 @@
+imports:
+  - path: vm-template.py
+  - path: firewall-template.py
+
+resources:
+  - name: messenger-firewall
+    type: firewall-template.py
+
+  - name: messenger-vm
+    type: vm-template.py
+    properties:
+      servername: messenger-server-staging
+      zone: us-central1-f
+      project: just-clock-419202
+      network: default
+      tags:
+        items:
+          - https
+      environment: staging
+      startup-script: |
+        #!/bin/bash
+        sudo apt update
+        sudo apt install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        docker pull us190190/messenger-app:3.0
+        docker run -e DB_HOST=XYZ -e DB_PASSWORD=XYZ -e DB_PORT=XYZ -e DB_USER=XYZ -p 443:443 messenger-app:3.0
