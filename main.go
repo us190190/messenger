@@ -24,7 +24,7 @@ func main() {
 	// Start server with HTTPS
 	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12} // You should configure this with your actual certificate and key paths
 	server := &http.Server{
-		Addr:      ":8443",
+		Addr:      ":443",
 		Handler:   nil, // Default router
 		TLSConfig: tlsConfig,
 	}
