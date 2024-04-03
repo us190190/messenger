@@ -1,28 +1,39 @@
-FROM ubuntu:latest
-LABEL authors="us190190"
+# Use an official Go runtime as a base image
+FROM golang:1.22-alpine AS builder
 
-ENTRYPOINT ["top", "-b"]
-
-# Start from the official Go image
-FROM golang:1.22
-
-# Set the Current Working Directory inside the container
+# Set the current working directory inside the container
 WORKDIR /app
 
-# Copy go.mod and go.sum files to the workspace
+# Copy go.mod and go.sum files to the working directory
 COPY go.mod go.sum ./
 
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
+# Download Go module dependencies
 RUN go mod download
 
-# Copy the source code from the current directory to the Working Directory inside the container
+# RUN apk --no-cache add netcat-openbsd
+
+# Copy the rest of the source code to the working directory
 COPY . .
 
-# Build the Go app
-RUN go build -o main .
+# Build the Go application
+RUN go build -o myapp .
 
-# Expose port 8080 to the outside world
+# Start a new stage from scratch
+FROM alpine:latest
+
+# Set the current working directory inside the container
+WORKDIR /app
+
+# Copy the built executable from the previous stage
+COPY --from=builder /app/myapp .
+
+# Copy SSL certificate files into the image
+COPY server.crt server.key ./
+RUN chmod +r /app/server.key
+RUN chmod +r /app/server.crt
+
+# Expose port 443
 EXPOSE 443
 
 # Command to run the executable
-CMD ["./main"]
+CMD ["./myapp"]

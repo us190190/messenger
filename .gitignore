@@ -1,5 +1,3 @@
 .idea
-server.crt
-server.key
 *.iml
 gcp-deployments-manager

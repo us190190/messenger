@@ -11,7 +11,11 @@ import (
 
 func main() {
 	// Initialize database connection
-	database.InitDB()
+	err := database.InitDB()
+	if err != nil {
+		log.Fatal("Application unable to connect with DB")
+		return
+	}
 
 	// Routes
 	http.HandleFunc("/v1/user/register", services.UserRegisterHandler)
@@ -28,5 +32,7 @@ func main() {
 		Handler:   nil, // Default router
 		TLSConfig: tlsConfig,
 	}
-	log.Fatal(server.ListenAndServeTLS("server.crt", "server.key"))
+	log.Printf("%v", server)
+
+	log.Fatal(server.ListenAndServeTLS("/app/server.crt", "/app/server.key"))
 }
