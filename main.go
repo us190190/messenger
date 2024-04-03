@@ -34,5 +34,5 @@ func main() {
 		Handler:   nil, // Default router
 		TLSConfig: tlsConfig,
 	}
-	log.Fatal(server.ListenAndServeTLS("server.crt", "server.key"))
+	log.Fatal(server.ListenAndServeTLS("/app/server.crt", "/app/server.key"))
 }
