@@ -93,7 +93,6 @@ func GetUndeliveredGrpMsgsByUserID(userID int) ([]Message, error) {
 	db := database.GetDB()
 	qry := fmt.Sprintf("SELECT id, user_id, group_id, last_delivered_msg_id "+
 		"FROM group_members WHERE user_id = %d", userID)
-	log.Println(fmt.Sprintf("undeliveredGrpMsgsWhereClauseList qry: %s", qry))
 	rows, err := db.Query(qry)
 	if err != nil {
 		log.Println(fmt.Sprintf("GetUndeliveredGrpMsgsByUserID failed qry: %s error: %v\n", qry, err))
@@ -125,7 +124,6 @@ func GetUndeliveredGrpMsgsByUserID(userID int) ([]Message, error) {
 	db = database.GetDB()
 	qry = fmt.Sprintf("SELECT id, sender_id, receiver_id, group_id, message, created_at, updated_at "+
 		"FROM messages WHERE %s ORDER BY created_at", undeliveredGrpMsgsWhereClause)
-	log.Println(fmt.Sprintf("undeliveredGrpMsgs qry: %s", qry))
 	rows, err = db.Query(qry)
 	if err != nil {
 		log.Println(fmt.Sprintf("GetUndeliveredGrpMsgsByUserID failed qry: %s error: %v\n", qry, err))

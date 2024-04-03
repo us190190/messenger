@@ -163,7 +163,7 @@ func handleWebSocketMessages(currentUser *models.User, conn *websocket.Conn) {
 			receiverConn, ok := connections[msg.ReceiverID]
 			if ok {
 				// if receiver is connected send the message immediately
-				err = receiverConn.WriteMessage(messageType, message)
+				err = receiverConn.WriteMessage(messageType, message) // TODO need to attach sender_id
 				if err != nil {
 					log.Printf("Error writing message to WebSocket from user %s: %s\n", currentUser.Username, err)
 					break
@@ -203,7 +203,7 @@ func handleWebSocketMessages(currentUser *models.User, conn *websocket.Conn) {
 				currGrpMemberConn, ok := connections[currGrpMember.UserID]
 				if ok {
 					// Group member is connected
-					err = currGrpMemberConn.WriteMessage(messageType, message)
+					err = currGrpMemberConn.WriteMessage(messageType, message) // TODO need to attach sender_id
 					if err != nil {
 						log.Printf("Error writing group message to WebSocket from user %s: %s\n", currentUser.Username, err)
 						continue
