@@ -5,13 +5,41 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/us190190/messenger/database"
 	"github.com/us190190/messenger/services"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
+type Config struct {
+	Database struct {
+		Host     string `yaml:"host"`
+		Port     string `yaml:"port"`
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+	} `yaml:"database"`
+}
+
 func main() {
+	// Read config.yaml file
+	configFile, err := ioutil.ReadFile("config.yaml")
+	if err != nil {
+		log.Fatalf("Failed to read config file: %v", err)
+	}
+	// Parse YAML
+	var config Config
+	if err = yaml.Unmarshal(configFile, &config); err != nil {
+		log.Fatalf("Failed to unmarshal config: %v", err)
+	}
+	// Set environment variables
+	os.Setenv("DB_HOST", config.Database.Host)
+	os.Setenv("DB_PORT", config.Database.Port)
+	os.Setenv("DB_USER", config.Database.User)
+	os.Setenv("DB_PASSWORD", config.Database.Password)
+
 	// Initialize database connection
-	err := database.InitDB()
+	err = database.InitDB()
 	if err != nil {
 		log.Fatal("Application unable to connect with DB")
 		return
@@ -32,7 +60,5 @@ func main() {
 		Handler:   nil, // Default router
 		TLSConfig: tlsConfig,
 	}
-	log.Printf("%v", server)
-
 	log.Fatal(server.ListenAndServeTLS("/app/server.crt", "/app/server.key"))
 }

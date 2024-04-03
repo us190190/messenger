@@ -2,11 +2,11 @@ Messenger Service
 
 
 TODO:
-1. Deliver Group message to online users
-2. Deliver group message to offline users at next connection
-3. interaction based on receiver_id and group_id
-4. DB connection pool and close
-5. gracefully shutdown the application
+1. P0: Deliver Group message to online users
+2. P0: Deliver group message to offline users at next connection
+3. 
+4. interaction based on receiver_id and group_id (expose APIs for all groups )
+5. 
 6. Setup document in READme
 7. Add postman collection
 8. architecture diagram
@@ -15,4 +15,3 @@ TODO:
     1. Compute engine
     2. MySQL
     3. env variables
-    4. certificate files
