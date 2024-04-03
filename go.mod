@@ -1,4 +1,4 @@
-module messenger
+module github.com/us190190/messenger
 
 go 1.22
 

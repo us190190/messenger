@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"github.com/us190190/messenger/contracts"
+	"github.com/us190190/messenger/models"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"messenger/contracts"
-	"messenger/models"
 	"net/http"
 	"sync"
 )

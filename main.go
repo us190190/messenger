@@ -3,9 +3,9 @@ package main
 import (
 	"crypto/tls"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/us190190/messenger/database"
+	"github.com/us190190/messenger/services"
 	"log"
-	"messenger/database"
-	"messenger/services"
 	"net/http"
 )
 

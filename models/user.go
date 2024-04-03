@@ -2,8 +2,8 @@ package models
 
 import (
 	"fmt"
+	"github.com/us190190/messenger/database"
 	"log"
-	"messenger/database"
 	"time"
 )
 
