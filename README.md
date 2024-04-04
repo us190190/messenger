@@ -1,5 +1,5 @@
-# Messenger [Service]
-The Messaging Service is a primitive platform for real-time communication between users. It provides an infrastructure for sending and receiving messages, supporting features such as text messaging, group chats, and more. Built with performance in mind, it ensures seamless communication across various devices and platforms.
+# Messenger Service
+The service is a primitive platform for real-time communication between users. It provides an infrastructure for sending and receiving messages, supporting features such as text messaging, group chats, and more. Built with performance in mind, it ensures seamless communication across various devices and platforms.
 
 ## Architecture diagram
       ┌─────────────┐
@@ -42,6 +42,13 @@ The Messaging Service is a primitive platform for real-time communication betwee
 3. Group Chats: Create and participate in group conversations with multiple users.
 4. Notifications: Receive push notifications for new messages and updates.
 5. Security: Ensure the privacy and security of messages with end-to-end encryption.
+
+## Technologies Used
+
+1. Backend: Go, MySQL
+2. Frontend: WIP
+3. Messaging Protocol: WebSocket
+4. Deployment: Docker, GCPDM
 
 ## Steps to deploy backend service on GCP DM
    gcloud deployment-manager deployments create messenger-app-infra --config messenger-deployment.yaml
