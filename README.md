@@ -70,9 +70,9 @@ The service is a primitive platform for real-time communication between users. I
 2. Messenger connection: [wss://<SERVER_IP_ADDRESS>:443/start]
 
 ## In-progress
-1. Frontend application to consume these backend messenger service
-2. Refactoring the repo
-3. Adding database migrations and seeder for the backend service
+1. Frontend application: To consume the messenger service
+2. Refactoring: It needs cleaning
+3. Migrations: Adding database migrations and seeder for the service
 4. Scalability: Scale the messaging service to accommodate growing user bases
 5. Reliability: Ensure high availability and reliability with fault-tolerant architecture.
    
