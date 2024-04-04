@@ -15,7 +15,34 @@
 3. Adding database migrations and seeder for the backend service
 
 ## Architecture diagram
-1. TODO
+      ┌─────────────┐
+      │   Clients   │
+      └─────────────┘
+             │
+             ▼
+      ┌─────────────┐
+      │    Load     │
+      │   Balancer  │
+      └─────────────┘
+             │
+       ┌─────┼─────┐
+       ▼     ▼     ▼
+      ┌─────────────┐
+      │  WebSocket  │
+      │   Servers   │
+      └─────────────┘
+             │
+       ┌─────┼─────┐
+       ▼     ▼     ▼
+      ┌─────────────┐
+      │   Backend   │
+      │  Services   │
+      └─────────────┘
+       │           │
+       ▼           ▼
+    ┌──────┐   ┌──────┐
+    │  DB  │   │ Cache│
+    └──────┘   └──────┘
 
 ## Low level design
 1. TODO
