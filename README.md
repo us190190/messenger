@@ -1,18 +1,5 @@
 # Messenger [Service]
-
-## Features
-1. User management - Register, Update, Authenticate, Remove
-2. Messaging supported:
-   1. personal messages between any two users
-   2. group messages among members of the group
-3. If a user is connected, then they receive personal or group messages immediately
-4. Offline users get both type of messages, when they come online
-5. Messages are end-to-end encrypted using SSL/TLS encryption
-
-## In-progress
-1. Frontend application to consume these backend messenger service
-2. Refactoring the repo
-3. Adding database migrations and seeder for the backend service
+The Messaging Service is a primitive platform for real-time communication between users. It provides an infrastructure for sending and receiving messages, supporting features such as text messaging, group chats, and more. Built with performance in mind, it ensures seamless communication across various devices and platforms.
 
 ## Architecture diagram
       ┌─────────────┐
@@ -49,9 +36,12 @@
 ## Low level design
 ![image](https://github.com/us190190/messenger/assets/3051295/cb0f4bb8-b909-44b3-8da2-107c903a5805)
 
-
-## Flow diagram
-1. TODO
+## Key Features
+1. User management: Register, Update, Authenticate, Remove a user
+2. Real-time Messaging: Instantly send and receive messages in real-time.
+3. Group Chats: Create and participate in group conversations with multiple users.
+4. Notifications: Receive push notifications for new messages and updates.
+5. Security: Ensure the privacy and security of messages with end-to-end encryption.
 
 ## Steps to deploy backend service on GCP DM
    gcloud deployment-manager deployments create messenger-app-infra --config messenger-deployment.yaml
@@ -68,6 +58,13 @@
 1. User management APIs collection: [User management APIs.postman_collection.json]
 2. Messenger connection: [wss://<SERVER_IP_ADDRESS>:443/start]
 
+## In-progress
+1. Frontend application to consume these backend messenger service
+2. Refactoring the repo
+3. Adding database migrations and seeder for the backend service
+4. Scalability: Scale the messaging service to accommodate growing user bases
+5. Reliability: Ensure high availability and reliability with fault-tolerant architecture.
+   
 ## Known issues
 1. Both live messages don't contain sender user information (sender is required to share his/her info along with each message)
 2. Need to manually add VM instance public IP to allow connectivity with DB instance
