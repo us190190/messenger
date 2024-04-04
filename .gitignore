@@ -1,2 +1,4 @@
 .idea
 *.iml
+server.key
+server.crt
